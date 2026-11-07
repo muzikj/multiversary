@@ -3,170 +3,627 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Universal Anniversary Calculator</title>
+<title>Anniversary Calculator &amp; Countdowns | Multiversary</title>
+<meta name="description" content="Multiversary's anniversary calculator: milestone dates in days, hours, minutes and seconds, with countdowns. Add to Google Calendar, Outlook or .ics.">
+<meta property="og:title" content="Anniversary Calculator &amp; Countdowns | Multiversary">
+<meta property="og:description" content="Multiversary's anniversary calculator: milestone dates in days, hours, minutes and seconds, with countdowns. Add to Google Calendar, Outlook or .ics.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://multiversary.com/">
+<link rel="canonical" href="https://multiversary.com/">
 <script src="https://cdn.jsdelivr.net/npm/luxon@3.4.4/build/global/luxon.min.js"></script>
 <link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.4.3/dist/tailwind.min.css" rel="stylesheet">
-<!-- <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script> -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 <style>
-  body {
-    background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
-    font-family: 'Inter', sans-serif;
+  :root {
+    --mono: 'Cascadia Code', Consolas, 'Courier New', monospace;
   }
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+    min-height: 100vh;
+    padding: 2rem 1rem;
+  }
+
+  .container {
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+
+  .header {
+    text-align: center;
+    color: white;
+    margin-bottom: 3rem;
+  }
+
+  .header h1 {
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.5px;
+  }
+
+  .header p {
+    font-size: 1.1rem;
+    opacity: 0.95;
+    max-width: 500px;
+    margin: 0 auto;
+  }
+
+  .brand-name {
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    opacity: 0.9;
+    margin-bottom: 0.5rem;
+  }
+
   .card {
     background: white;
-    border-radius: 1rem;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-    padding: 1.5rem;
-    transition: transform 0.3s, box-shadow 0.3s;
+    border-radius: 1.25rem;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
   }
+
   .card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 12px 25px rgba(0,0,0,0.15);
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
   }
+
+  .form-card {
+    padding: 2.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .form-group label {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 0.6rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .form-group input {
+    padding: 0.9rem 1rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 0.75rem;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    font-family: inherit;
+  }
+
+  .form-group input:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    background: #f9fafb;
+  }
+
+  .form-group input::placeholder {
+    color: #9ca3af;
+  }
+
+  .helper-text {
+    font-size: 0.85rem;
+    color: #6b7280;
+    margin-top: 0.4rem;
+  }
+
+  .hexbin-toggle {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 44px;
+    margin-bottom: 1.25rem;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #1f2937;
+    cursor: pointer;
+  }
+
   .button-primary {
-    background: linear-gradient(90deg, #4f46e5, #6366f1);
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
     font-weight: 600;
     border-radius: 0.75rem;
-    padding: 0.75rem 1.5rem;
-    transition: background 0.3s;
-  }
-  .button-primary:hover {
-    background: linear-gradient(90deg, #6366f1, #4f46e5);
-  }
-  .button-secondary {
-    background: linear-gradient(90deg, #10b981, #34d399);
-    color: white;
-    font-weight: 600;
-    border-radius: 0.75rem;
-    padding: 0.5rem 1rem;
-    transition: background 0.3s;
-  }
-  .button-secondary:hover {
-    background: linear-gradient(90deg, #34d399, #10b981);
-  }
-  input {
-    border-radius: 0.75rem;
-    border: 1px solid #d1d5db;
-    padding: 0.5rem;
+    padding: 1rem 2rem;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 1rem;
     width: 100%;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
   }
-  /* .adsbygoogle {
-    border-radius: 1rem;
-    overflow: hidden;
-    box-shadow: inset 0 0 5px rgba(0,0,0,0.05);
-  } */
+
+  .button-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+  }
+
+  .button-primary:active {
+    transform: translateY(0);
+  }
+
+  .calendar-links {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .calendar-link {
+    flex: 1;
+    display: block;
+    padding: 0.8rem 0.5rem;
+    border: none;
+    border-radius: 0.75rem;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+    font-family: inherit;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .calendar-link:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(16, 185, 129, 0.3);
+  }
+
+  .select-card {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 44px;
+    margin-bottom: 0.5rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #374151;
+    cursor: pointer;
+  }
+
+  .select-card input,
+  .hexbin-toggle input {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+  }
+
+  .bulk-bar {
+    position: sticky;
+    top: 1rem;
+    z-index: 10;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 2rem;
+    padding: 0.75rem 1rem;
+    border-radius: 0.75rem;
+    background: white;
+    color: #1f2937;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    font-size: 1rem;
+    font-weight: 600;
+  }
+
+  .bulk-button {
+    padding: 0.8rem 1.4rem;
+    border: none;
+    border-radius: 0.75rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .bulk-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .results-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-top: 2rem;
+  }
+
+  .result-card {
+    background: white;
+    border-radius: 1.25rem;
+    padding: 1.8rem;
+    border: 1px solid #e5e7eb;
+    transition: all 0.3s ease;
+    container-type: inline-size;
+  }
+
+  .result-card:hover {
+    border-color: #667eea;
+    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.15);
+  }
+
+  .milestone-count {
+    font-size: 2.5rem;
+    white-space: nowrap;
+    font-weight: 800;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 0.5rem;
+  }
+
+  .long-count {
+    font-size: 1.75rem;
+    font-size: min(2.5rem, calc(100cqi / 9));
+  }
+
+  .notation {
+    text-transform: none;
+    letter-spacing: 0;
+    font-family: var(--mono);
+  }
+
+  .milestone-unit {
+    font-size: 1rem;
+    color: #6b7280;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 1rem;
+  }
+
+  .milestone-date {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 0.4rem;
+  }
+
+  .milestone-time {
+    font-size: 0.85rem;
+    color: #6b7280;
+    margin-bottom: 1.2rem;
+  }
+
+  .countdown {
+    background: #f3f4f6;
+    padding: 1rem;
+    border-radius: 0.75rem;
+    margin-bottom: 1.2rem;
+    font-size: 0.85rem;
+    color: #374151;
+    font-weight: 600;
+  }
+
+  .countdown-label {
+    font-size: 0.85rem;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.4rem;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 3rem 2rem;
+    color: #6b7280;
+  }
+
+  .empty-state i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+  }
+
+  @media (max-width: 640px) {
+    .header h1 {
+      font-size: 1.75rem;
+    }
+
+    .form-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .results-grid {
+      grid-template-columns: 1fr;
+    }
+  }
 </style>
 </head>
-<body class="p-6">
-<div class="max-w-5xl mx-auto bg-white p-10 rounded-3xl shadow-2xl">
-  <h1 class="text-4xl font-bold text-center mb-8 text-purple-700">Universal Anniversary Calculator</h1>
-  <p class="text-center text-slate-600 mb-8">Calculate upcoming meaningful anniversaries of any event in multiple units and add them to your calendar.</p>
-
-  <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-    <div>
-      <label class="block text-sm font-medium mb-1">Event Date</label>
-      <input id="dob" type="datetime-local" />
-    </div>
-    <div>
-      <label class="block text-sm font-medium mb-1">Start Counting From</label>
-      <input id="start" type="datetime-local" />
-      <script>document.getElementById('start').value = new Date().toISOString().slice(0,16);</script>
-    </div>
-    <div>
-      <label class="block text-sm font-medium mb-1">Timezone</label>
-      <input id="dob" type="datetime-local" />
-    </div>
-    <div>
-      <label class="block text-sm font-medium mb-1">Timezone</label>
-      <input id="tz" type="text" placeholder="e.g. Europe/Prague" />
-      <p class="text-xs text-slate-400 mt-1">Defaults to your browser timezone.</p>
-    </div>
-    <div>
-      <label class="block text-sm font-medium mb-1">Number of Results</label>
-      <input id="count" type="number" min="1" max="200" value="10" />
-    </div>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="brand-name">Multiversary</div>
+    <h1>🎉 Anniversary Calculator &amp; Countdowns</h1>
+    <p>Find anniversary milestones in days, hours, minutes and seconds, with countdowns. Add any date to Google Calendar, Outlook or an .ics file.</p>
   </div>
 
-  <div class="text-center mb-6">
-    <button id="compute" class="button-primary">Compute Anniversaries</button>
+  <div class="card form-card">
+    <div class="form-grid">
+      <div class="form-group">
+        <label for="dob-date"><i class="fas fa-calendar-alt"></i> Event Date</label>
+        <input id="dob-date" type="date" />
+        <span class="helper-text">When did it start?</span>
+      </div>
+
+      <div class="form-group">
+        <label for="dob-time"><i class="fas fa-clock"></i> Event Time</label>
+        <input id="dob-time" type="time" />
+        <span class="helper-text">Empty means 00:00</span>
+      </div>
+
+      <div class="form-group">
+        <label for="event-name"><i class="fas fa-tag"></i> Event Name</label>
+        <input id="event-name" type="text" placeholder="e.g. Wedding" />
+        <span class="helper-text">Optional, used in calendar files</span>
+      </div>
+
+      <div class="form-group" id="start-group" style="display: none;">
+        <label><i class="fas fa-clock"></i> Start Counting From</label>
+        <input id="start" type="datetime-local" />
+        <span class="helper-text">Custom start time</span>
+      </div>
+
+      <div class="form-group" id="tz-group" style="display: none;">
+        <label><i class="fas fa-globe"></i> Timezone</label>
+        <input id="tz" type="text" placeholder="e.g. Europe/Prague" />
+        <span class="helper-text">Auto-detected from browser</span>
+      </div>
+
+      <div class="form-group" style="display: none;">
+        <label><i class="fas fa-list-ol"></i> Number of Results</label>
+        <input id="count" type="number" min="1" max="200" value="10" />
+        <span class="helper-text">1 to 200</span>
+      </div>
+    </div>
+
+    <label class="hexbin-toggle">
+      <input id="hexbin" type="checkbox" /> Include hex &amp; binary values
+    </label>
+
+    <button id="compute" class="button-primary">
+      <i class="fas fa-calculator"></i> Calculate Anniversaries
+    </button>
   </div>
 
-  <!-- Advertisement at the top -->
-  <!--
-  <div class="my-6 p-4 bg-gray-100 rounded-xl text-center shadow-inner">
-    <p class="text-slate-500 mb-2">Sponsored</p>
-    <ins class="adsbygoogle"
-         style="display:block"
-         data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
-         data-ad-slot="1234567890"
-         data-ad-format="auto"
-         data-full-width-responsive="true"></ins>
-    <script>
-      (adsbygoogle = window.adsbygoogle || []).push({});
-    </script>
+  <div id="bulk-bar" class="bulk-bar" style="display: none;">
+    <span id="selected-count">0 selected</span>
+    <button id="download-selected" class="bulk-button" disabled>Download selected (.ics)</button>
   </div>
-  -->
-
-  <div id="output" class="grid gap-6 md:grid-cols-2"></div>
-
-  <!-- Advertisement at the bottom -->
-  <!--
-  <div class="my-6 p-4 bg-gray-100 rounded-xl text-center shadow-inner">
-    <p class="text-slate-500 mb-2">Advertisement</p>
-    <ins class="adsbygoogle"
-         style="display:block"
-         data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
-         data-ad-slot="0987654321"
-         data-ad-format="auto"
-         data-full-width-responsive="true"></ins>
-    <script>
-      (adsbygoogle = window.adsbygoogle || []).push({});
-    </script>
-  </div>
-  -->
-
+  <div id="output" class="results-grid"></div>
 </div>
 
 <script>
-const DateTime = luxon.DateTime;
-document.getElementById("tz").value = DateTime.local().zoneName;
+let DateTime;
+let allTargets = [];
+let currentDisplayCount = 10;
+let currentNow;
+let selectedKeys = new Set();
+let currentAllDay = false;
+const PRODUCT_URL = 'https://multiversary.com/';
+const PRODUCT_NOTE = `Created with Multiversary: ${PRODUCT_URL}`;
+
+function initializeApp() {
+  if (typeof luxon === 'undefined') {
+    setTimeout(initializeApp, 100);
+    return;
+  }
+
+  DateTime = luxon.DateTime;
+  restoreInputs();
+
+  setupEventListeners();
+}
+
+const STORAGE_KEY = 'anniversaryCalculator';
+
+function restoreInputs() {
+  const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+  document.getElementById("dob-date").value = saved.date || '';
+  document.getElementById("dob-time").value = saved.time || '';
+  document.getElementById("tz").value = saved.tz || DateTime.local().zoneName;
+  document.getElementById("hexbin").checked = !!saved.hexbin;
+  document.getElementById("event-name").value = saved.name || '';
+}
+
+function saveInputs() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify({
+    date: document.getElementById("dob-date").value,
+    time: document.getElementById("dob-time").value,
+    tz: document.getElementById("tz").value,
+    hexbin: document.getElementById("hexbin").checked,
+    name: document.getElementById("event-name").value
+  }));
+}
+
+function toDateTimeString(date, time) {
+  const [h = '', m = '', s = ''] = (time || '').split(':');
+  return `${date}T${(h || '0').padStart(2,'0')}:${(m || '0').padStart(2,'0')}:${(s || '0').padStart(2,'0')}`;
+}
+
 const units = ['months','weeks','days','hours','minutes','seconds'];
 
 function getExactCount(dob, now, unit) {
-  return now.diff(dob, unit).as(unit);
+  return Math.max(now.diff(dob, unit).as(unit), 0);
 }
 
-function generateTargets(dob, now, count){
+function trailingZeros(k){
+  let z = 0;
+  while(k > 0 && k % 10 === 0){
+    z++;
+    k /= 10;
+  }
+  return z;
+}
+
+function generateTargets(dob, now, count, includeHexBin){
   const targets = [];
   units.forEach(unit=>{
     const exact = getExactCount(dob, now, unit);
-    const magnitude = Math.pow(10, Math.max(Math.floor(Math.log10(exact || 1)) - 1, 0));
-    let k = Math.ceil(exact / magnitude) * magnitude;
-    for(let i=0;i<count;i++){
-      let t;
-      if(unit==='months') t = dob.plus({months:k});
-      else if(unit==='weeks') t = dob.plus({days:k*7});
-      else if(unit==='days') t = dob.plus({days:k});
-      else if(unit==='hours') t = dob.plus({hours:k});
-      else if(unit==='minutes') t = dob.plus({minutes:k});
-      else t = dob.plus({seconds:k});
-      targets.push({k,t,unit});
-      k+=magnitude;
+    const at = k => {
+      if(unit==='months') return dob.plus({months:k});
+      if(unit==='weeks') return dob.plus({days:k*7});
+      if(unit==='days') return dob.plus({days:k});
+      if(unit==='hours') return dob.plus({hours:k});
+      if(unit==='minutes') return dob.plus({minutes:k});
+      return dob.plus({seconds:k});
+    };
+    // rounded: a single non-zero digit followed by zeros (10, 500, 40000)
+    for(let n=0;n<=12;n++){
+      for(let d=1;d<=9;d++){
+        const k = d * Math.pow(10,n);
+        if(k <= exact) continue;
+        const t = at(k);
+        if(t.isValid) targets.push({k,t,unit,note:''});
+      }
+    }
+    // same-digit milestones (111, 2222, 33333, ...) are added on top of the rounded ones; 999... is skipped as it is followed by a round number
+    for(let len=1; len<=12; len++){
+      for(let d=1; d<=8; d++){
+        const same = d * (Math.pow(10,len) - 1) / 9;
+        if(same <= exact) continue;
+        const t = at(same);
+        if(t.isValid) targets.push({k:same,t,unit,note:'',extra:true});
+      }
+    }
+    // pi digits (3.14159... read as 314, 3141, 31415, ...) are extras like the same-digit ones
+    ['314','3141','31415','314159','3141592','31415926'].forEach(digits=>{
+      const k = Number(digits);
+      if(k <= exact) return;
+      const t = at(k);
+      if(t.isValid) targets.push({k,t,unit,note:'π',extra:true});
+    });
+    if(includeHexBin){
+      // hex: a single non-zero hex digit followed by zeros (0x1, 0x10, 0xA00, 0x1000)
+      for(let n=0;n<=10;n++){
+        for(let d=1;d<=15;d++){
+          const k = d * Math.pow(16,n);
+          if(k <= exact) continue;
+          const t = at(k);
+          if(t.isValid) targets.push({k,t,unit,note:'0x' + k.toString(16).toUpperCase()});
+        }
+      }
+      // powers of two; capped so the date stays within Luxon's range
+      for(let n=0;n<=60;n++){
+        const k = Math.pow(2,n);
+        if(k <= exact) continue;
+        const t = at(k);
+        if(!t.isValid) break;
+        targets.push({k,t,unit,note:'2^' + n});
+      }
     }
   });
-  targets.sort((a,b)=>a.t - b.t);
-  return targets.slice(0,count);
+  // the same count can be reached by more than one rule; keep the first
+  const seen = new Set();
+  const unique = targets.filter(x => {
+    const key = x.unit + ':' + x.k;
+    if(seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+  unique.sort((a,b)=>a.t - b.t);
+  // across all units, a less round value never follows a rounder one; same-digit, hex and binary values are extras
+  const horizon = now.plus({years:120});
+  let maxZeros = -1;
+  const ranked = unique.filter(x => {
+    if(x.t > horizon) return false;
+    if(x.extra || x.note) return true;
+    const z = trailingZeros(x.k);
+    if(z < maxZeros) return false;
+    maxZeros = z;
+    return true;
+  });
+  return ranked.slice(0,count);
 }
 
 function formatUntil(now, target){
-  const diff = target.diff(now,['days','hours','minutes','seconds']).toObject();
-  return `${Math.floor(diff.days||0)}d ${Math.floor(diff.hours||0)}h ${Math.floor(diff.minutes||0)}m ${Math.floor(diff.seconds||0)}s`;
+  const diff = target.diff(now,['years','days','hours']).toObject();
+  const years = Math.floor(diff.years||0);
+  const days = Math.floor(diff.days||0);
+  const hours = Math.floor(diff.hours||0);
+
+  if(years > 0) return `${years}y`;
+  if(days > 0) return `${days}d`;
+  return `${hours}h`;
 }
 
-function generateICS(eventDate, title="Anniversary"){
-  const dt = eventDate.toUTC().toFormat("yyyyMMdd'T'HHmmss'Z'");
-  return `BEGIN:VCALENDAR\nVERSION:2.0\nBEGIN:VEVENT\nDTSTART:${dt}\nSUMMARY:${title}\nEND:VEVENT\nEND:VCALENDAR`;
+function calendarTime(dt){
+  return dt.toUTC().toFormat("yyyyMMdd'T'HHmmss'Z'");
+}
+
+function calendarDay(dt){
+  return dt.toFormat('yyyyMMdd');
+}
+
+function escapeICS(text){
+  return text.replace(/[\\;,]/g, c => '\\' + c).replace(/\n/g, '\\n');
+}
+
+function safeFileName(text){
+  return text.replace(/[\\/:*?"<>|]/g, '');
+}
+
+function cardKey({k,unit}){
+  return `${unit}:${k}`;
+}
+
+function anniversaryEvent(k, unit, t){
+  const eventName = document.getElementById('event-name').value.trim();
+  const label = `${k} ${unit} anniversary`;
+  const nameKey = eventName.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase().replace(/[^\p{L}\p{N}]/gu, '');
+  return {
+    t,
+    allDay: currentAllDay,
+    title: eventName ? `${eventName}: ${label}` : label,
+    uid: `${t.toMillis()}-${unit}-${k}-${nameKey}@multiversary.com`
+  };
+}
+
+function icsEvent({t, title, uid, allDay}){
+  const times = allDay
+    ? [`DTSTART;VALUE=DATE:${calendarDay(t)}`, `DTEND;VALUE=DATE:${calendarDay(t.plus({days:1}))}`]
+    : [`DTSTART:${calendarTime(t)}`, `DTEND:${calendarTime(t.plus({hours:1}))}`];
+  return [
+    'BEGIN:VEVENT',
+    `UID:${uid}`,
+    `DTSTAMP:${calendarTime(DateTime.now())}`,
+    ...times,
+    `SUMMARY:${escapeICS(title)}`,
+    `DESCRIPTION:${escapeICS(PRODUCT_NOTE)}`,
+    `URL:${PRODUCT_URL}`,
+    'END:VEVENT'
+  ].join('\n');
+}
+
+function buildICS(events){
+  return ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Multiversary//Anniversary Calculator//EN', ...events.map(icsEvent), 'END:VCALENDAR'].join('\n');
 }
 
 function downloadICS(content, filename){
@@ -177,34 +634,144 @@ function downloadICS(content, filename){
   link.click();
 }
 
-document.getElementById('compute').addEventListener('click',()=>{
-  const dobStr = document.getElementById('dob').value;
-  const tz = document.getElementById('tz').value || DateTime.local().zoneName;
-  const count = Math.max(1,Number(document.getElementById('count').value)||10);
+function renderResults(targets, now, displayCount) {
   const out = document.getElementById('output');
 
-  if(!dobStr){ out.innerHTML=`<p class='text-center text-slate-500'>Please enter an event date.</p>`; return; }
-  const dob = DateTime.fromISO(dobStr,{zone:tz});
-  if(!dob.isValid){ out.innerHTML=`<p class='text-center text-red-500'>Invalid date/time.</p>`; return; }
-
-  const startStr = document.getElementById('start').value;
-  const now = startStr ? DateTime.fromISO(startStr,{zone:tz}) : DateTime.now().setZone(tz);
-  const targets = generateTargets(dob, now, count);
+  if(targets.length === 0) {
+    out.innerHTML=`<div class='empty-state' style='grid-column: 1/-1'><i class='fas fa-inbox'></i><p><strong>No results</strong></p><p style='margin-top: 0.5rem'>Try adjusting your parameters</p></div>`;
+    return;
+  }
 
   let html='';
-  targets.forEach(({k,t,unit},i)=>{
-    html+=`<div class='card'>
-      <div class='mb-3'>
-        <div class='text-sm text-slate-400'>${k.toLocaleString()} ${unit}</div>
-        <div class='text-xl font-bold text-purple-700'>${t.toLocaleString(DateTime.DATETIME_FULL)}</div>
-        <div class='text-xs text-slate-300'>${t.toISO()}</div>
-        <div class='text-sm text-slate-500 mt-1'>Time until: ${formatUntil(now,t)}</div>
+  const itemsToShow = Math.min(displayCount, targets.length);
+  const eventName = document.getElementById('event-name').value.trim();
+  const icsEvents = [];
+
+  targets.slice(0, itemsToShow).forEach(({k,t,unit,note},i)=>{
+    const unitLabel = unit.length > 1 && unit.slice(-1) !== 's' ? unit + 's' : unit;
+    const timeUntil = formatUntil(now, t);
+    const countText = k.toLocaleString();
+    const ev = anniversaryEvent(k, unit, t);
+    const title = ev.title;
+    const key = cardKey({k,unit});
+    const fileName = (eventName ? `${eventName} ${k} ${unit}` : `anniversary_${i+1}`).replace(/[\\/:*?"<>|]/g, '') + '.ics';
+    const end = t.plus({hours:1});
+    icsEvents.push({...ev, fileName});
+    const encodedNote = encodeURIComponent(PRODUCT_NOTE);
+    const googleUrl = ev.allDay
+      ? `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${calendarDay(t)}/${calendarDay(t.plus({days:1}))}&details=${encodedNote}`
+      : `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${calendarTime(t)}/${calendarTime(end)}&details=${encodedNote}`;
+    const outlookUrl = ev.allDay
+      ? `https://outlook.live.com/calendar/0/deeplink/compose?subject=${encodeURIComponent(title)}&allday=true&startdt=${t.toISODate()}&enddt=${t.plus({days:1}).toISODate()}&body=${encodedNote}`
+      : `https://outlook.live.com/calendar/0/deeplink/compose?subject=${encodeURIComponent(title)}&startdt=${encodeURIComponent(t.toUTC().toISO({suppressMilliseconds:true}))}&enddt=${encodeURIComponent(end.toUTC().toISO({suppressMilliseconds:true}))}&body=${encodedNote}`;
+    const timeHtml = currentAllDay ? '' : `<div class='milestone-time'>${t.toLocaleString(DateTime.TIME_24_SIMPLE)}</div>`;
+
+    html+=`<div class='result-card'>
+      <label class='select-card'><input type='checkbox' data-key='${key}'${selectedKeys.has(key) ? ' checked' : ''} /> Select</label>
+      <div class='milestone-count${countText.length > 9 ? ' long-count' : ''}'>${countText}</div>
+      <div class='milestone-unit'>${unitLabel}${note ? " <span class='notation'>(" + note + ")</span>" : ''}</div>
+      <div class='milestone-date'>${t.toLocaleString(DateTime.DATE_FULL)}</div>
+      ${timeHtml}
+      <div class='countdown-label'>Approx. time until anniversary</div>
+      <div class='countdown'>${timeUntil}</div>
+      <div class='calendar-links'>
+        <a class='calendar-link' href='${googleUrl}' target='_blank' rel='noopener'>Google</a>
+        <a class='calendar-link' href='${outlookUrl}' target='_blank' rel='noopener'>Outlook</a>
+        <button class='calendar-link' data-ics='${i}'>.ics</button>
       </div>
-      <button class='button-secondary w-full' onclick="downloadICS(generateICS(DateTime.fromISO('${t.toISO()}'),'${k} ${unit} anniversary'),'anniversary_${i+1}.ics')">Add to Calendar</button>
     </div>`;
   });
-  out.innerHTML=html;
-});
+
+  out.innerHTML = html;
+
+  out.querySelectorAll('[data-ics]').forEach(button => {
+    button.addEventListener('click', () => {
+      const ev = icsEvents[button.dataset.ics];
+      downloadICS(buildICS([ev]), ev.fileName);
+    });
+  });
+  updateSelection();
+}
+
+function updateSelection(){
+  const count = selectedKeys.size;
+  document.getElementById('bulk-bar').style.display = count > 0 && allTargets.length > 0 ? 'flex' : 'none';
+  document.getElementById('selected-count').textContent = `${count} selected`;
+  document.getElementById('download-selected').disabled = count === 0;
+}
+
+function setupEventListeners() {
+  ['dob-date','dob-time','tz','hexbin','event-name'].forEach(id => {
+    const input = document.getElementById(id);
+    input.addEventListener('input', saveInputs);
+    input.addEventListener('change', saveInputs);
+    input.addEventListener('keydown', e => {
+      if(e.key === 'Enter') document.getElementById('compute').click();
+    });
+  });
+  ['hexbin','event-name'].forEach(id => {
+    document.getElementById(id).addEventListener('change', () => {
+      if(allTargets.length > 0) document.getElementById('compute').click();
+    });
+  });
+
+  document.getElementById('compute').addEventListener('click',()=>{
+    document.getElementById('bulk-bar').style.display = 'none';
+    const dateStr = document.getElementById('dob-date').value;
+    const dobStr = dateStr ? toDateTimeString(dateStr, document.getElementById('dob-time').value) : '';
+    const tz = document.getElementById('tz').value || DateTime.local().zoneName;
+    const out = document.getElementById('output');
+
+    if(!dobStr){
+      out.innerHTML=`<div class='empty-state' style='grid-column: 1/-1'><i class='fas fa-calendar-days'></i><p><strong>No event date entered</strong></p><p style='margin-top: 0.5rem'>Enter an event date to see upcoming anniversaries</p></div>`;
+      return;
+    }
+
+    const dob = DateTime.fromISO(dobStr,{zone:tz});
+    if(!dob.isValid){
+      out.innerHTML=`<div class='empty-state' style='grid-column: 1/-1'><i class='fas fa-exclamation-circle'></i><p><strong>Invalid date/time</strong></p><p style='margin-top: 0.5rem'>Please check your date and timezone</p></div>`;
+      return;
+    }
+
+    const startStr = document.getElementById('start').value;
+    currentNow = startStr ? DateTime.fromISO(startStr,{zone:tz}) : DateTime.now().setZone(tz);
+    allTargets = generateTargets(dob, currentNow, 1000, document.getElementById('hexbin').checked);
+    selectedKeys.clear();
+    currentAllDay = !document.getElementById('dob-time').value;
+    currentDisplayCount = 10;
+
+    renderResults(allTargets, currentNow, currentDisplayCount);
+  });
+
+  document.getElementById('output').addEventListener('change', e => {
+    if(!e.target.matches('input[data-key]')) return;
+    if(e.target.checked) selectedKeys.add(e.target.dataset.key);
+    else selectedKeys.delete(e.target.dataset.key);
+    updateSelection();
+  });
+
+  document.getElementById('download-selected').addEventListener('click', () => {
+    const events = allTargets.filter(x => selectedKeys.has(cardKey(x))).map(x => anniversaryEvent(x.k, x.unit, x.t));
+    const name = document.getElementById('event-name').value.trim();
+    downloadICS(buildICS(events), safeFileName(`Multiversary ${name || 'anniversaries'}`) + '.ics');
+  });
+
+  window.addEventListener('scroll', () => {
+    if(window.innerHeight + window.scrollY >= document.body.offsetHeight - 300) loadMore();
+  });
+}
+
+function loadMore() {
+  if(currentDisplayCount >= allTargets.length) return;
+  currentDisplayCount += 10;
+  renderResults(allTargets, currentNow, currentDisplayCount);
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initializeApp);
+} else {
+  initializeApp();
+}
 </script>
 </body>
 </html>

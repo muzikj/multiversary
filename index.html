@@ -10,7 +10,7 @@
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://multiversary.com/">
 <link rel="canonical" href="https://multiversary.com/">
-<script src="https://cdn.jsdelivr.net/npm/luxon@3.4.4/build/global/luxon.min.js"></script>
+<script src="js/luxon.min.js"></script>
 <link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.4.3/dist/tailwind.min.css" rel="stylesheet">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 <style>
@@ -119,6 +119,52 @@
     border-color: #667eea;
     box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
     background: #f9fafb;
+  }
+
+  .form-group input.invalid {
+    border-color: #ef4444;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+  }
+
+  .date-field {
+    position: relative;
+    display: flex;
+  }
+
+  .date-field #dob-date-text {
+    flex: 1;
+    min-width: 0;
+    padding-right: 2.75rem;
+  }
+
+  .picker-btn {
+    position: absolute;
+    top: 50%;
+    right: 0.4rem;
+    transform: translateY(-50%);
+    padding: 0.5rem;
+    border: none;
+    background: none;
+    color: #6b7280;
+    font-size: 1rem;
+    cursor: pointer;
+  }
+
+  .picker-btn:hover,
+  .picker-btn:focus-visible {
+    color: #667eea;
+  }
+
+  .form-group .native-hidden {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 1px;
+    padding: 0;
+    border: 0;
+    opacity: 0;
+    pointer-events: none;
   }
 
   .form-group input::placeholder {
@@ -342,6 +388,49 @@
     opacity: 0.5;
   }
 
+  .lang-switch {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    z-index: 50;
+    display: flex;
+    padding: 3px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(10px);
+  }
+
+  .lang-switch button {
+    min-width: 44px;
+    padding: 0.35rem 0.8rem;
+    border: none;
+    border-radius: 999px;
+    background: transparent;
+    color: white;
+    font-family: inherit;
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease;
+  }
+
+  .lang-switch button:hover {
+    background: rgba(255, 255, 255, 0.2);
+  }
+
+  .lang-switch button[aria-pressed="true"] {
+    background: white;
+    color: #5b4bb0;
+    cursor: default;
+  }
+
+  .lang-switch button:focus-visible {
+    outline: 2px solid white;
+    outline-offset: 2px;
+  }
+
   @media (max-width: 640px) {
     .header h1 {
       font-size: 1.75rem;
@@ -358,64 +447,73 @@
 </style>
 </head>
 <body>
+<div class="lang-switch" role="group" aria-label="Language">
+  <button type="button" data-lang="en" title="English" aria-pressed="true">EN</button>
+  <button type="button" data-lang="cs" title="Čeština" aria-pressed="false">CS</button>
+</div>
 <div class="container">
   <div class="header">
     <div class="brand-name">Multiversary</div>
-    <h1>🎉 Anniversary Calculator &amp; Countdowns</h1>
-    <p>Find anniversary milestones in days, hours, minutes and seconds, with countdowns. Add any date to Google Calendar, Outlook or an .ics file.</p>
+    <h1>🎉 <span data-i18n="title">Anniversary Calculator &amp; Countdowns</span></h1>
+    <p data-i18n="subtitle">Find anniversary milestones in days, hours, minutes and seconds, with countdowns. Add any date to Google Calendar, Outlook or an .ics file.</p>
   </div>
 
   <div class="card form-card">
     <div class="form-grid">
       <div class="form-group">
-        <label for="dob-date"><i class="fas fa-calendar-alt"></i> Event Date</label>
-        <input id="dob-date" type="date" />
-        <span class="helper-text">When did it start?</span>
+        <label for="dob-date-text"><i class="fas fa-calendar-alt"></i> <span data-i18n="eventDate">Event Date</span></label>
+        <div class="date-field">
+          <input id="dob-date-text" type="text" inputmode="numeric" autocomplete="off" placeholder="MM/DD/YYYY" data-i18n-placeholder="datePlaceholder" />
+          <button type="button" id="dob-date-picker" class="picker-btn" title="Pick a date" aria-label="Pick a date" data-i18n-title="pickDate"><i class="fas fa-calendar-days"></i></button>
+          <input id="dob-date" class="native-hidden" type="date" tabindex="-1" aria-hidden="true" />
+        </div>
+        <span class="helper-text" data-i18n="eventDateHelper">When did it start?</span>
       </div>
 
       <div class="form-group">
-        <label for="dob-time"><i class="fas fa-clock"></i> Event Time</label>
-        <input id="dob-time" type="time" />
-        <span class="helper-text">Empty means 00:00</span>
+        <label for="dob-time-text"><i class="fas fa-clock"></i> <span data-i18n="eventTime">Event Time</span></label>
+        <input id="dob-time-text" type="text" inputmode="numeric" autocomplete="off" placeholder="h:mm AM/PM" data-i18n-placeholder="timePlaceholder" />
+        <input id="dob-time" type="hidden" />
+        <span class="helper-text" data-i18n="eventTimeHelper">Empty means 00:00</span>
       </div>
 
       <div class="form-group">
-        <label for="event-name"><i class="fas fa-tag"></i> Event Name</label>
-        <input id="event-name" type="text" placeholder="e.g. Wedding" />
-        <span class="helper-text">Optional, used in calendar files</span>
+        <label for="event-name"><i class="fas fa-tag"></i> <span data-i18n="eventName">Event Name</span></label>
+        <input id="event-name" type="text" placeholder="e.g. Wedding" data-i18n-placeholder="eventNamePlaceholder" />
+        <span class="helper-text" data-i18n="eventNameHelper">Optional, used in calendar files</span>
       </div>
 
       <div class="form-group" id="start-group" style="display: none;">
-        <label><i class="fas fa-clock"></i> Start Counting From</label>
+        <label><i class="fas fa-clock"></i> <span data-i18n="startCounting">Start Counting From</span></label>
         <input id="start" type="datetime-local" />
-        <span class="helper-text">Custom start time</span>
+        <span class="helper-text" data-i18n="startCountingHelper">Custom start time</span>
       </div>
 
       <div class="form-group" id="tz-group" style="display: none;">
-        <label><i class="fas fa-globe"></i> Timezone</label>
-        <input id="tz" type="text" placeholder="e.g. Europe/Prague" />
-        <span class="helper-text">Auto-detected from browser</span>
+        <label><i class="fas fa-globe"></i> <span data-i18n="timezone">Timezone</span></label>
+        <input id="tz" type="text" placeholder="e.g. Europe/Prague" data-i18n-placeholder="timezonePlaceholder" />
+        <span class="helper-text" data-i18n="timezoneHelper">Auto-detected from browser</span>
       </div>
 
       <div class="form-group" style="display: none;">
-        <label><i class="fas fa-list-ol"></i> Number of Results</label>
+        <label><i class="fas fa-list-ol"></i> <span data-i18n="numResults">Number of Results</span></label>
         <input id="count" type="number" min="1" max="200" value="10" />
-        <span class="helper-text">1 to 200</span>
+        <span class="helper-text" data-i18n="numResultsHelper">1 to 200</span>
       </div>
     </div>
 
     <label class="hexbin-toggle">
-      <input id="hexbin" type="checkbox" /> Include hex &amp; binary values
+      <input id="hexbin" type="checkbox" /> <span data-i18n="includeHexBinary">Include hex &amp; binary values</span>
     </label>
 
     <button id="compute" class="button-primary">
-      <i class="fas fa-calculator"></i> Calculate Anniversaries
+      <i class="fas fa-calculator"></i> <span data-i18n="calculate">Calculate Anniversaries</span>
     </button>
   </div>
 
   <div id="bulk-bar" class="bulk-bar" style="display: none;">
     <span id="selected-count">0 selected</span>
-    <button id="download-selected" class="bulk-button" disabled>Download selected (.ics)</button>
+    <button id="download-selected" class="bulk-button" disabled data-i18n="downloadSelected">Download selected (.ics)</button>
   </div>
   <div id="output" class="results-grid"></div>
 </div>
@@ -427,8 +525,122 @@ let currentDisplayCount = 10;
 let currentNow;
 let selectedKeys = new Set();
 let currentAllDay = false;
+let currentLang = localStorage.getItem('lang') || (navigator.language.startsWith('cs') ? 'cs' : 'en');
 const PRODUCT_URL = 'https://multiversary.com/';
 const PRODUCT_NOTE = `Created with Multiversary: ${PRODUCT_URL}`;
+
+const LANG = {
+  en: {
+    "title": "Anniversary Calculator & Countdowns",
+    "subtitle": "Find anniversary milestones in days, hours, minutes and seconds, with countdowns. Add any date to Google Calendar, Outlook or an .ics file.",
+    "eventDate": "Event Date",
+    "eventDateHelper": "When did it start?",
+    "eventTime": "Event Time",
+    "eventTimeHelper": "Empty means 00:00",
+    "datePlaceholder": "MM/DD/YYYY",
+    "timePlaceholder": "h:mm AM/PM",
+    "pickDate": "Pick a date",
+    "eventName": "Event Name",
+    "eventNamePlaceholder": "e.g. Wedding",
+    "eventNameHelper": "Optional, used in calendar files",
+    "startCounting": "Start Counting From",
+    "startCountingHelper": "Custom start time",
+    "timezone": "Timezone",
+    "timezonePlaceholder": "e.g. Europe/Prague",
+    "timezoneHelper": "Auto-detected from browser",
+    "numResults": "Number of Results",
+    "numResultsHelper": "1 to 200",
+    "includeHexBinary": "Include hex & binary values",
+    "calculate": "Calculate Anniversaries",
+    "downloadSelected": "Download selected (.ics)",
+    "noResults": "No results",
+    "noResultsAdvice": "Try adjusting your parameters",
+    "noEventDate": "No event date entered",
+    "noEventDateAdvice": "Enter an event date to see upcoming anniversaries",
+    "invalidDate": "Invalid date/time",
+    "invalidDateAdvice": "Please check your date and timezone",
+    "approxTimeUntil": "Approx. time until anniversary",
+    "untilYears": "{n}y",
+    "untilDays": "{n}d",
+    "untilHours": "{n}h",
+    "select": "Select",
+    "selected": "_count_ selected",
+    "anniversary": "anniversary",
+    "months": "months",
+    "weeks": "weeks",
+    "days": "days",
+    "hours": "hours",
+    "minutes": "minutes",
+    "seconds": "seconds"
+  },
+  cs: {
+    "title": "Kalkulátor výročí a odpočty",
+    "subtitle": "Zjistěte milníky výročí ve dnech, hodinách, minutách a sekundách s odpočtem. Přidejte libovolné datum do Kalendáře Google, Outlooku nebo souboru .ics.",
+    "eventDate": "Datum události",
+    "eventDateHelper": "Kdy to začalo?",
+    "eventTime": "Čas události",
+    "eventTimeHelper": "Prázdné pole znamená 00:00",
+    "datePlaceholder": "D. M. RRRR",
+    "timePlaceholder": "H:mm",
+    "pickDate": "Vybrat datum",
+    "eventName": "Název události",
+    "eventNamePlaceholder": "např. Svatba",
+    "eventNameHelper": "Volitelné, použije se v souborech kalendáře",
+    "startCounting": "Začít počítat od",
+    "startCountingHelper": "Vlastní počáteční čas",
+    "timezone": "Časové pásmo",
+    "timezonePlaceholder": "např. Europe/Prague",
+    "timezoneHelper": "Automaticky zjištěno z prohlížeče",
+    "numResults": "Počet výsledků",
+    "numResultsHelper": "1 až 200",
+    "includeHexBinary": "Zahrnout šestnáctkové a binární hodnoty",
+    "calculate": "Vypočítat výročí",
+    "downloadSelected": "Stáhnout vybrané (.ics)",
+    "noResults": "Žádné výsledky",
+    "noResultsAdvice": "Zkuste upravit parametry",
+    "noEventDate": "Není zadáno datum události",
+    "noEventDateAdvice": "Zadejte datum události a uvidíte nadcházející výročí",
+    "invalidDate": "Neplatné datum/čas",
+    "invalidDateAdvice": "Zkontrolujte prosím datum a časové pásmo",
+    "approxTimeUntil": "Do výročí zbývá cca.",
+    "untilYears": "{n} r.",
+    "untilDays": "{n} d",
+    "untilHours": "{n} h",
+    "select": "Vybrat",
+    "selected": "Vybráno: _count_",
+    "anniversary": "výročí",
+    "months": "měsíce",
+    "weeks": "týdny",
+    "days": "dny",
+    "hours": "hodiny",
+    "minutes": "minuty",
+    "seconds": "sekundy"
+  }
+};
+
+function tr(key) {
+  return (LANG[currentLang] || LANG.en)[key] || key;
+}
+
+function updateSelectedCount() {
+  document.getElementById('selected-count').textContent = tr('selected').replace('_count_', selectedKeys.size);
+}
+
+function applyLanguage() {
+  document.documentElement.lang = currentLang;
+  document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = tr(el.dataset.i18n); });
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el => { el.placeholder = tr(el.dataset.i18nPlaceholder); });
+  document.querySelectorAll('.lang-switch button').forEach(btn => {
+    btn.setAttribute('aria-pressed', String(btn.dataset.lang === currentLang));
+  });
+  document.querySelectorAll('[data-i18n-title]').forEach(el => {
+    const label = tr(el.dataset.i18nTitle);
+    el.title = label;
+    el.setAttribute('aria-label', label);
+  });
+  if (DateTime) refreshInputTexts();
+  updateSelectedCount();
+}
 
 function initializeApp() {
   if (typeof luxon === 'undefined') {
@@ -437,6 +649,8 @@ function initializeApp() {
   }
 
   DateTime = luxon.DateTime;
+  luxon.Settings.defaultLocale = currentLang === 'cs' ? 'cs' : 'en-US';
+  applyLanguage();
   restoreInputs();
 
   setupEventListeners();
@@ -451,9 +665,14 @@ function restoreInputs() {
   document.getElementById("tz").value = saved.tz || DateTime.local().zoneName;
   document.getElementById("hexbin").checked = !!saved.hexbin;
   document.getElementById("event-name").value = saved.name || '';
+  document.getElementById("dob-date-text").value = '';
+  document.getElementById("dob-time-text").value = '';
+  refreshInputTexts();
 }
 
 function saveInputs() {
+  commitDateText();
+  commitTimeText();
   localStorage.setItem(STORAGE_KEY, JSON.stringify({
     date: document.getElementById("dob-date").value,
     time: document.getElementById("dob-time").value,
@@ -461,6 +680,74 @@ function saveInputs() {
     hexbin: document.getElementById("hexbin").checked,
     name: document.getElementById("event-name").value
   }));
+}
+
+function dateToText(iso) {
+  const d = iso ? DateTime.fromISO(iso) : null;
+  if (!d || !d.isValid) return '';
+  return currentLang === 'cs' ? d.toFormat('d. M. yyyy') : d.toFormat('MM/dd/yyyy');
+}
+
+function parseDateText(text) {
+  const m = text.trim().match(/^(\d{1,4})\D+(\d{1,2})\D+(\d{1,4})\.?$/);
+  if (!m) return null;
+  let y, mo, d;
+  if (m[1].length === 4) [y, mo, d] = [m[1], m[2], m[3]];
+  else if (currentLang === 'cs') [d, mo, y] = [m[1], m[2], m[3]];
+  else [mo, d, y] = [m[1], m[2], m[3]];
+  if (y.length !== 4 || d.length > 2) return null;
+  const dt = DateTime.fromObject({ year: +y, month: +mo, day: +d });
+  return dt.isValid ? dt.toISODate() : null;
+}
+
+function timeToText(time) {
+  if (!time) return '';
+  const [h, m = 0, s = 0] = time.split(':').map(Number);
+  const dt = DateTime.fromObject({ hour: h, minute: m, second: s }, { locale: currentLang === 'cs' ? 'cs' : 'en-US' });
+  if (!dt.isValid) return '';
+  const sec = s ? ':ss' : '';
+  return currentLang === 'cs' ? dt.toFormat('H:mm' + sec) : dt.toFormat('h:mm' + sec + ' a');
+}
+
+function parseTimeText(text) {
+  const m = text.trim().match(/^(\d{1,2})(?::(\d{2}))?(?::(\d{2}))?\s*(?:([ap])\.?m\.?)?$/i);
+  if (!m) return null;
+  let h = +m[1];
+  const mi = +(m[2] || 0), s = +(m[3] || 0);
+  if (m[4]) {
+    if (h < 1 || h > 12) return null;
+    h = (h % 12) + (m[4].toLowerCase() === 'p' ? 12 : 0);
+  }
+  if (h > 23 || mi > 59 || s > 59) return null;
+  const pad = n => String(n).padStart(2, '0');
+  return `${pad(h)}:${pad(mi)}` + (s ? ':' + pad(s) : '');
+}
+
+function commitDateText() {
+  const text = document.getElementById('dob-date-text').value.trim();
+  const iso = text ? parseDateText(text) : '';
+  document.getElementById('dob-date').value = iso || '';
+  return text === '' || !!iso;
+}
+
+function commitTimeText() {
+  const text = document.getElementById('dob-time-text').value.trim();
+  const time = text ? parseTimeText(text) : '';
+  document.getElementById('dob-time').value = time || '';
+  return text === '' || !!time;
+}
+
+function markInvalid(id, bad) {
+  const el = document.getElementById(id);
+  el.classList.toggle('invalid', bad);
+  el.setAttribute('aria-invalid', String(bad));
+}
+
+function refreshInputTexts() {
+  const date = document.getElementById('dob-date').value;
+  const time = document.getElementById('dob-time').value;
+  if (date) document.getElementById('dob-date-text').value = dateToText(date);
+  if (time) document.getElementById('dob-time-text').value = timeToText(time);
 }
 
 function toDateTimeString(date, time) {
@@ -569,9 +856,9 @@ function formatUntil(now, target){
   const days = Math.floor(diff.days||0);
   const hours = Math.floor(diff.hours||0);
 
-  if(years > 0) return `${years}y`;
-  if(days > 0) return `${days}d`;
-  return `${hours}h`;
+  if(years > 0) return tr('untilYears').replace('{n}', years);
+  if(days > 0) return tr('untilDays').replace('{n}', days);
+  return tr('untilHours').replace('{n}', hours);
 }
 
 function calendarTime(dt){
@@ -594,15 +881,15 @@ function cardKey({k,unit}){
   return `${unit}:${k}`;
 }
 
-function anniversaryEvent(k, unit, t){
+function anniversaryEvent(k, unit, targetDate){
   const eventName = document.getElementById('event-name').value.trim();
-  const label = `${k} ${unit} anniversary`;
+  const label = `${k} ${unit} ${tr('anniversary')}`;
   const nameKey = eventName.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase().replace(/[^\p{L}\p{N}]/gu, '');
   return {
-    t,
+    t: targetDate,
     allDay: currentAllDay,
     title: eventName ? `${eventName}: ${label}` : label,
-    uid: `${t.toMillis()}-${unit}-${k}-${nameKey}@multiversary.com`
+    uid: `${targetDate.toMillis()}-${unit}-${k}-${nameKey}@multiversary.com`
   };
 }
 
@@ -638,7 +925,7 @@ function renderResults(targets, now, displayCount) {
   const out = document.getElementById('output');
 
   if(targets.length === 0) {
-    out.innerHTML=`<div class='empty-state' style='grid-column: 1/-1'><i class='fas fa-inbox'></i><p><strong>No results</strong></p><p style='margin-top: 0.5rem'>Try adjusting your parameters</p></div>`;
+    out.innerHTML=`<div class='empty-state' style='grid-column: 1/-1'><i class='fas fa-inbox'></i><p><strong>${tr('noResults')}</strong></p><p style='margin-top: 0.5rem'>${tr('noResultsAdvice')}</p></div>`;
     return;
   }
 
@@ -647,32 +934,33 @@ function renderResults(targets, now, displayCount) {
   const eventName = document.getElementById('event-name').value.trim();
   const icsEvents = [];
 
-  targets.slice(0, itemsToShow).forEach(({k,t,unit,note},i)=>{
-    const unitLabel = unit.length > 1 && unit.slice(-1) !== 's' ? unit + 's' : unit;
-    const timeUntil = formatUntil(now, t);
-    const countText = k.toLocaleString();
-    const ev = anniversaryEvent(k, unit, t);
+  targets.slice(0, itemsToShow).forEach(({k,t: targetDate,unit,note},i)=>{
+    const unitLabel = tr(unit);
+    const timeUntil = formatUntil(now, targetDate);
+    const locale = currentLang === 'cs' ? 'cs' : 'en-US';
+    const countText = k.toLocaleString(locale);
+    const ev = anniversaryEvent(k, unit, targetDate);
     const title = ev.title;
     const key = cardKey({k,unit});
     const fileName = (eventName ? `${eventName} ${k} ${unit}` : `anniversary_${i+1}`).replace(/[\\/:*?"<>|]/g, '') + '.ics';
-    const end = t.plus({hours:1});
+    const end = targetDate.plus({hours:1});
     icsEvents.push({...ev, fileName});
     const encodedNote = encodeURIComponent(PRODUCT_NOTE);
     const googleUrl = ev.allDay
-      ? `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${calendarDay(t)}/${calendarDay(t.plus({days:1}))}&details=${encodedNote}`
-      : `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${calendarTime(t)}/${calendarTime(end)}&details=${encodedNote}`;
+      ? `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${calendarDay(targetDate)}/${calendarDay(targetDate.plus({days:1}))}&details=${encodedNote}`
+      : `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${calendarTime(targetDate)}/${calendarTime(end)}&details=${encodedNote}`;
     const outlookUrl = ev.allDay
-      ? `https://outlook.live.com/calendar/0/deeplink/compose?subject=${encodeURIComponent(title)}&allday=true&startdt=${t.toISODate()}&enddt=${t.plus({days:1}).toISODate()}&body=${encodedNote}`
-      : `https://outlook.live.com/calendar/0/deeplink/compose?subject=${encodeURIComponent(title)}&startdt=${encodeURIComponent(t.toUTC().toISO({suppressMilliseconds:true}))}&enddt=${encodeURIComponent(end.toUTC().toISO({suppressMilliseconds:true}))}&body=${encodedNote}`;
-    const timeHtml = currentAllDay ? '' : `<div class='milestone-time'>${t.toLocaleString(DateTime.TIME_24_SIMPLE)}</div>`;
+      ? `https://outlook.live.com/calendar/0/deeplink/compose?subject=${encodeURIComponent(title)}&allday=true&startdt=${targetDate.toISODate()}&enddt=${targetDate.plus({days:1}).toISODate()}&body=${encodedNote}`
+      : `https://outlook.live.com/calendar/0/deeplink/compose?subject=${encodeURIComponent(title)}&startdt=${encodeURIComponent(targetDate.toUTC().toISO({suppressMilliseconds:true}))}&enddt=${encodeURIComponent(end.toUTC().toISO({suppressMilliseconds:true}))}&body=${encodedNote}`;
+    const timeHtml = currentAllDay ? '' : `<div class='milestone-time'>${targetDate.setLocale(locale).toLocaleString(DateTime.TIME_SIMPLE)}</div>`;
 
     html+=`<div class='result-card'>
-      <label class='select-card'><input type='checkbox' data-key='${key}'${selectedKeys.has(key) ? ' checked' : ''} /> Select</label>
+      <label class='select-card'><input type='checkbox' data-key='${key}'${selectedKeys.has(key) ? ' checked' : ''} /> ${tr('select')}</label>
       <div class='milestone-count${countText.length > 9 ? ' long-count' : ''}'>${countText}</div>
       <div class='milestone-unit'>${unitLabel}${note ? " <span class='notation'>(" + note + ")</span>" : ''}</div>
-      <div class='milestone-date'>${t.toLocaleString(DateTime.DATE_FULL)}</div>
+      <div class='milestone-date'>${targetDate.setLocale(locale).toLocaleString(DateTime.DATE_FULL)}</div>
       ${timeHtml}
-      <div class='countdown-label'>Approx. time until anniversary</div>
+      <div class='countdown-label'>${tr('approxTimeUntil')}</div>
       <div class='countdown'>${timeUntil}</div>
       <div class='calendar-links'>
         <a class='calendar-link' href='${googleUrl}' target='_blank' rel='noopener'>Google</a>
@@ -696,18 +984,44 @@ function renderResults(targets, now, displayCount) {
 function updateSelection(){
   const count = selectedKeys.size;
   document.getElementById('bulk-bar').style.display = count > 0 && allTargets.length > 0 ? 'flex' : 'none';
-  document.getElementById('selected-count').textContent = `${count} selected`;
+  updateSelectedCount();
   document.getElementById('download-selected').disabled = count === 0;
 }
 
 function setupEventListeners() {
-  ['dob-date','dob-time','tz','hexbin','event-name'].forEach(id => {
+  document.querySelectorAll('.lang-switch button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (btn.dataset.lang === currentLang) return;
+      currentLang = btn.dataset.lang;
+      localStorage.setItem('lang', currentLang);
+      luxon.Settings.defaultLocale = currentLang === 'cs' ? 'cs' : 'en-US';
+      applyLanguage();
+      if(allTargets.length > 0) {
+        renderResults(allTargets, currentNow, currentDisplayCount);
+      }
+    });
+  });
+
+  ['dob-date-text','dob-time-text','tz','hexbin','event-name'].forEach(id => {
     const input = document.getElementById(id);
     input.addEventListener('input', saveInputs);
     input.addEventListener('change', saveInputs);
     input.addEventListener('keydown', e => {
       if(e.key === 'Enter') document.getElementById('compute').click();
     });
+  });
+  document.getElementById('dob-date-text').addEventListener('input', () => markInvalid('dob-date-text', false));
+  document.getElementById('dob-date-text').addEventListener('change', () => { markInvalid('dob-date-text', !commitDateText()); refreshInputTexts(); });
+  document.getElementById('dob-time-text').addEventListener('input', () => markInvalid('dob-time-text', false));
+  document.getElementById('dob-time-text').addEventListener('change', () => { markInvalid('dob-time-text', !commitTimeText()); refreshInputTexts(); });
+  document.getElementById('dob-date-picker').addEventListener('click', () => {
+    const picker = document.getElementById('dob-date');
+    try { picker.showPicker(); } catch (e) { picker.focus(); picker.click(); }
+  });
+  document.getElementById('dob-date').addEventListener('change', e => {
+    document.getElementById('dob-date-text').value = dateToText(e.target.value);
+    markInvalid('dob-date-text', false);
+    saveInputs();
   });
   ['hexbin','event-name'].forEach(id => {
     document.getElementById(id).addEventListener('change', () => {
@@ -717,19 +1031,24 @@ function setupEventListeners() {
 
   document.getElementById('compute').addEventListener('click',()=>{
     document.getElementById('bulk-bar').style.display = 'none';
+    const dateOk = commitDateText();
+    const timeOk = commitTimeText();
+    markInvalid('dob-date-text', !dateOk);
+    markInvalid('dob-time-text', !timeOk);
+    refreshInputTexts();
     const dateStr = document.getElementById('dob-date').value;
     const dobStr = dateStr ? toDateTimeString(dateStr, document.getElementById('dob-time').value) : '';
     const tz = document.getElementById('tz').value || DateTime.local().zoneName;
     const out = document.getElementById('output');
 
-    if(!dobStr){
-      out.innerHTML=`<div class='empty-state' style='grid-column: 1/-1'><i class='fas fa-calendar-days'></i><p><strong>No event date entered</strong></p><p style='margin-top: 0.5rem'>Enter an event date to see upcoming anniversaries</p></div>`;
+    if(!dobStr && dateOk && timeOk){
+      out.innerHTML=`<div class='empty-state' style='grid-column: 1/-1'><i class='fas fa-calendar-days'></i><p><strong>${tr('noEventDate')}</strong></p><p style='margin-top: 0.5rem'>${tr('noEventDateAdvice')}</p></div>`;
       return;
     }
 
     const dob = DateTime.fromISO(dobStr,{zone:tz});
-    if(!dob.isValid){
-      out.innerHTML=`<div class='empty-state' style='grid-column: 1/-1'><i class='fas fa-exclamation-circle'></i><p><strong>Invalid date/time</strong></p><p style='margin-top: 0.5rem'>Please check your date and timezone</p></div>`;
+    if(!dateOk || !timeOk || !dob.isValid){
+      out.innerHTML=`<div class='empty-state' style='grid-column: 1/-1'><i class='fas fa-exclamation-circle'></i><p><strong>${tr('invalidDate')}</strong></p><p style='margin-top: 0.5rem'>${tr('invalidDateAdvice')}</p></div>`;
       return;
     }
 

@@ -862,13 +862,14 @@ function generateTargets(dob, now, count, includeHexBin){
     return true;
   });
   unique.sort((a,b)=>a.t - b.t);
-  // across all units, a less round value never follows a rounder one; same-digit, hex and binary values are extras
+  // across all units, a less round value never follows a rounder one; same-digit, hex, binary and pure powers of ten (1000, 10000, ...) are always kept
   const horizon = now.plus({years:120});
   let maxZeros = -1;
   const ranked = unique.filter(x => {
     if(x.t > horizon) return false;
     if(x.extra || x.note) return true;
     const z = trailingZeros(x.k);
+    if(x.k === Math.pow(10,z)) return true;
     if(z < maxZeros) return false;
     maxZeros = z;
     return true;
